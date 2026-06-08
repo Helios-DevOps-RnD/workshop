@@ -1,0 +1,12 @@
+{
+  "name": "vivere-app",
+  "private": true,
+  "scripts": {
+    "test": "jest",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "jest": "^30.0.0"
+  }
+}
