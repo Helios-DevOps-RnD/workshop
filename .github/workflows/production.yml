@@ -1,0 +1,105 @@
+name: Production Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY: harbor-vivere.evanlwp.my.id/app/guest-webapp
+
+jobs:
+  cd-production:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Get Current Staging Image Tag
+        run: |
+          mkdir -p ~/.ssh
+
+          KEY_FILE=$(mktemp)
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > $KEY_FILE
+          chmod 600 $KEY_FILE
+
+          ssh-keyscan -H 48.193.43.204 >> ~/.ssh/known_hosts
+
+          STAGING_TAG=$(ssh -i $KEY_FILE vivere@48.193.43.204 \
+            "cat /home/vivere/current_staging_tag.txt")
+
+          echo "STAGING_TAG=$STAGING_TAG" >> $GITHUB_ENV
+
+          rm -f $KEY_FILE
+
+      - name: Deploy to Production VM
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: 48.193.42.143
+          username: vivere
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: REGISTRY,STAGING_TAG
+          script: |
+
+            set -e
+
+            docker login harbor-vivere.evanlwp.my.id \
+              -u "${{ secrets.HARBOR_USER }}" \
+              -p "${{ secrets.HARBOR_PASSWORD }}"
+
+            PREVIOUS_TAG=$(cat /home/vivere/current_prod_tag.txt 2>/dev/null || echo "")
+
+            echo "Previous Tag: $PREVIOUS_TAG"
+            echo "Deploying Tag: $STAGING_TAG"
+
+            docker pull $REGISTRY:$STAGING_TAG
+
+            docker stop web-app-prod || true
+            docker rm web-app-prod || true
+
+            docker run -d \
+              --restart unless-stopped \
+              --name web-app-prod \
+              -p 80:80 \
+              $REGISTRY:$STAGING_TAG
+
+            echo "Waiting application startup..."
+            sleep 15
+
+            if docker ps --format '{{.Names}}' | grep -q '^web-app-prod$'; then
+
+              echo "Container is running"
+
+              echo "$STAGING_TAG" > /home/vivere/current_prod_tag.txt
+
+            else
+
+              echo "Deployment failed. Starting rollback..."
+
+              docker stop web-app-prod || true
+              docker rm web-app-prod || true
+
+              if [ -n "$PREVIOUS_TAG" ]; then
+
+                docker pull $REGISTRY:$PREVIOUS_TAG
+
+                docker run -d \
+                  --restart unless-stopped \
+                  --name web-app-prod \
+                  -p 80:80 \
+                  $REGISTRY:$PREVIOUS_TAG
+
+                echo "Rollback completed to $PREVIOUS_TAG"
+
+              else
+
+                echo "No rollback image found"
+                exit 1
+
+              fi
+            fi
+
+            docker image prune -af --filter "until=720h" || true
+
+            echo "Production deployment completed successfully"

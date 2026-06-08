@@ -1,0 +1,152 @@
+name: Staging Deployment
+
+on:
+  push:
+    branches:
+      - staging
+
+env:
+  IMAGE_TAG: ${{ github.sha }}
+  REGISTRY: harbor-vivere.evanlwp.my.id/app/guest-webapp
+  
+jobs:
+  ci-cd-staging:
+    runs-on: self-hosted
+
+    steps:
+      # =========================
+      # SOURCE CODE
+      # =========================
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      # =========================
+      # CONTINUOUS INTEGRATION
+      # =========================
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Unit Test
+        run: npx jest tests/app.test.js
+
+      - name: Setup Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Start Temporary Nginx Container
+        run: |
+          docker run -d \
+            -p 8080:80 \
+            -v ${{ github.workspace }}/src:/usr/share/nginx/html \
+            --name temp-e2e \
+            nginx:alpine
+
+      - name: Run Playwright E2E Test
+        run: |
+          npx playwright test tests/e2e.spec.js
+
+      - name: Cleanup E2E Container
+        if: always()
+        run: |
+          docker rm -f temp-e2e || true
+
+      - name: Upload Playwright Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_number }}
+          path: playwright-report/
+          if-no-files-found: ignore
+          retention-days: 30
+
+      # =========================
+      # BUILD IMAGE
+      # =========================
+
+      - name: Build Docker Image
+        run: |
+          docker build \
+            -t ${{ env.REGISTRY }}:${{ env.IMAGE_TAG }} \
+            .
+
+      # =========================
+      # SECURITY SCAN
+      # =========================
+
+      - name: Trivy Vulnerability Scan
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          image-ref: ${{ env.REGISTRY }}:${{ env.IMAGE_TAG }}
+          format: table
+          ignore-unfixed: true
+          exit-code: "0"
+
+      # =========================
+      # PUSH TO HARBOR
+      # =========================
+
+      - name: Login Harbor
+        run: |
+          docker login harbor-vivere.evanlwp.my.id \
+            -u "${{ secrets.HARBOR_USER }}" \
+            -p "${{ secrets.HARBOR_PASSWORD }}"
+
+      - name: Push Docker Image
+        run: |
+          docker push ${{ env.REGISTRY }}:${{ env.IMAGE_TAG }}
+
+      # =========================
+      # DEPLOY TO STAGING
+      # =========================
+
+      - name: Deploy to Staging VM
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: 48.193.43.204
+          username: vivere
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+
+            docker login harbor-vivere.evanlwp.my.id \
+              -u "${{ secrets.HARBOR_USER }}" \
+              -p "${{ secrets.HARBOR_PASSWORD }}"
+
+            docker pull ${{ env.REGISTRY }}:${{ env.IMAGE_TAG }}
+
+            docker stop web-app-staging || true
+            docker rm web-app-staging || true
+
+            docker run -d \
+              --name web-app-staging \
+              -p 80:80 \
+              --restart unless-stopped \
+              ${{ env.REGISTRY }}:${{ env.IMAGE_TAG }}
+
+            # Simpan image yang sukses di-deploy
+            echo "${{ env.IMAGE_TAG }}" > /home/vivere/current_staging_tag.txt
+
+            # Tunggu container startup
+            sleep 10
+
+            # Verifikasi container running
+            docker ps | grep web-app-staging
+
+            # Cleanup image lama (>7 hari)
+            docker image prune -af --filter "until=168h" || true
+
+      # =========================
+      # CLEANUP RUNNER
+      # =========================
+
+      - name: Cleanup Local Docker Images
+        if: always()
+        run: |
+          docker rmi ${{ env.REGISTRY }}:${{ env.IMAGE_TAG }} || true
+          docker image prune -af || true
