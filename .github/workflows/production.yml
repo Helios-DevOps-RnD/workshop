@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  REGISTRY: harbor-vivere.evanlwp.my.id/app
+  REGISTRY: harbor-vivere.evanlwp.my.id/app/guest-webapp
 
 jobs:
   cd-production:
