@@ -7,7 +7,7 @@ on:
 
 env:
   IMAGE_TAG: ${{ github.sha }}
-  REGISTRY: harbor-vivere.evanlwp.my.id/vivere/app
+  REGISTRY: harbor-vivere.evanlwp.my.id/app
 
 jobs:
   ci-cd-staging:
