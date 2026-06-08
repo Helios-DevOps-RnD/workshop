@@ -48,7 +48,6 @@ jobs:
               -u "${{ secrets.HARBOR_USER }}" \
               -p "${{ secrets.HARBOR_PASSWORD }}"
 
-            # Ambil tag production sebelumnya (untuk rollback)
             PREVIOUS_TAG=$(cat /home/vivere/current_prod_tag.txt 2>/dev/null || echo "")
 
             echo "Previous Tag: $PREVIOUS_TAG"
@@ -68,15 +67,10 @@ jobs:
             echo "Waiting application startup..."
             sleep 15
 
-            # =========================
-            # HEALTH CHECK
-            # =========================
-
             if docker ps --format '{{.Names}}' | grep -q '^web-app-prod$'; then
 
               echo "Container is running"
 
-              # Simpan tag yang sukses deploy
               echo "$STAGING_TAG" > /home/vivere/current_prod_tag.txt
 
             else
@@ -105,10 +99,6 @@ jobs:
 
               fi
             fi
-
-            # =========================
-            # CLEANUP
-            # =========================
 
             docker image prune -af --filter "until=720h" || true
 
