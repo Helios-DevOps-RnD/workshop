@@ -1,1 +1,1 @@
-# workshop
+# Vivere DevOps Workshop
