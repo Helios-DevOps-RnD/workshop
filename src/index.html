@@ -97,11 +97,25 @@
 <body>
     <div class="card">
         <h2>Vivere Guest Registry</h2>
+        
+        <div id="welcomeAlert"></div>
+
+        <div class="admin-panel">
+            <h3 style="margin-top:0; font-size: 16px;">Admin Login (Mock)</h3>
+            <input type="password" id="adminPwd" placeholder="Enter Admin Password">
+            <button id="loginBtn">Login</button>
+        </div>
+
         <div class="form-group">
-            <input type="text" id="guestName" placeholder="Input guest name..." autocomplete="off">
+            <input type="text" id="guestName" placeholder="Input guest name... (Try <img src=x onerror=alert(1)>)" autocomplete="off">
             <button id="addBtn" class="btn-primary">Register</button>
         </div>
+        
         <ul id="guestList"></ul>
+
+        <div style="margin-top: 20px; font-size: 12px; text-align: center;">
+            <a href="http://insecure-website.com" target="_blank">Visit Our Partners (Insecure Link)</a>
+        </div>
     </div>
 
     <script src="app.js"></script>
