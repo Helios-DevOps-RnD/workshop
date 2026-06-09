@@ -19,8 +19,8 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'http://48.193.43.204' 
-          project_name: 'vivere-guest-webapp-staging'
-          fail_action: false # PENTING: Ubah ke 'true' jika ingin pipeline GAGAL saat nemu celah keamanan
+          fail_action: false 
+          allow_issue_writing: false 
           
       # ==========================================
       # UPLOAD REPORT SEBAGAI ARTIFACT GUI
