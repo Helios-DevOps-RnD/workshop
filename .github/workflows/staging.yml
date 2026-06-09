@@ -20,6 +20,8 @@ jobs:
 
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -28,7 +30,7 @@ jobs:
           cache: "npm"
 
       # =========================
-      # CONTINUOUS INTEGRATION
+      # CONTINUOUS INTEGRATION (TESTING)
       # =========================
 
       - name: Install Dependencies
@@ -67,6 +69,21 @@ jobs:
           retention-days: 30
 
       # =========================
+      # CODE QUALITY ANALYSIS (SONARQUBE)
+      # =========================
+
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@v4.1.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: "http://70.153.137.147:9000" # IP VM Management Anda
+        with:
+          args: >
+            -Dsonar.projectKey=vivere-guest-webapp
+            -Dsonar.sources=src
+            -Dsonar.tests=tests
+
+      # =========================
       # BUILD IMAGE
       # =========================
 
@@ -77,7 +94,7 @@ jobs:
             .
 
       # =========================
-      # SECURITY SCAN
+      # SECURITY SCAN (CONTAINER)
       # =========================
 
       - name: Trivy Vulnerability Scan
@@ -113,7 +130,6 @@ jobs:
           username: vivere
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-
             docker login harbor-vivere.evanlwp.my.id \
               -u "${{ secrets.HARBOR_USER }}" \
               -p "${{ secrets.HARBOR_PASSWORD }}"
