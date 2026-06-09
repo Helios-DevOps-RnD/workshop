@@ -6,7 +6,7 @@ USER_HOME="/home/vivere"
 
 # 1. Update system & Install utility packages + Certbot Base
 apt-get update -y
-apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release git jq wget certbot
+apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release git jq wget certbot unzip
 
 # 2. Install Docker Engine (Otomatis menyertakan Docker Compose Plugin terbaru)
 curl -fsSL https://get.docker.com -o get-docker.sh
