@@ -1,8 +1,8 @@
 #!/bin/bash
 
-DOMAIN_HARBOR="harbor-vivere.evanlwp.my.id"
-EMAIL_ALERTS="admin@evanlwp.my.id"
-USER_HOME="/home/vivere"
+DOMAIN_HARBOR="harbor-vivere.evanlwp.my.id" # Ganti dengan domain yang sudah Anda arahkan ke IP Management VM
+EMAIL_ALERTS="admin@evanlwp.my.id" # Ganti dengan email yang valid untuk menerima notifikasi dari Let's Encrypt
+USER_HOME="/home/vivere" # Home directory untuk user vivere, pastikan sesuai dengan setup Anda
 
 # 1. Update system & Install utility packages + Certbot Base
 apt-get update -y

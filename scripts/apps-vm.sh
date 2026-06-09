@@ -12,9 +12,9 @@ USER_HOME="/home/vivere"
 mkdir -p $USER_HOME/.ssh
 
 # 3. INJEKSI PUBLIC KEY VM Apps
-PUBLIC_KEY_VM1="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJMZ5aPPlGhbjJX4gT0OZZuHfnCElSn/MNdpC1e8TIvT vivere@management"
+PUBLIC_KEY_VM="" # Ganti dengan public key yang sudah Anda generate, pastikan formatnya benar (biasanya dimulai dengan "ssh-ed25519" atau "ssh-rsa")
 
-echo "$PUBLIC_KEY_VM1" >> $USER_HOME/.ssh/authorized_keys
+echo "$PUBLIC_KEY_VM" >> $USER_HOME/.ssh/authorized_keys
 
 # 4. ATUR HAK AKSES & KEPEMILIKAN 
 chmod 700 $USER_HOME/.ssh

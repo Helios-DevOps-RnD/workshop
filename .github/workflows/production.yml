@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  REGISTRY: harbor-vivere.evanlwp.my.id/app/guest-webapp
+  REGISTRY: "${{ vars.HARBOR_REGISTRY }}/app/guest-webapp"
 
 jobs:
   cd-production:
@@ -24,9 +24,11 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > $KEY_FILE
           chmod 600 $KEY_FILE
 
-          ssh-keyscan -H 48.193.43.204 >> ~/.ssh/known_hosts
+          # UPDATE: Menggunakan GitHub Variable untuk IP VM Staging
+          ssh-keyscan -H ${{ vars.STAGING_VM_HOST }} >> ~/.ssh/known_hosts
 
-          STAGING_TAG=$(ssh -i $KEY_FILE vivere@48.193.43.204 \
+          # UPDATE: Menggunakan GitHub Variable untuk IP VM Staging
+          STAGING_TAG=$(ssh -i $KEY_FILE vivere@${{ vars.STAGING_VM_HOST }} \
             "cat /home/vivere/current_staging_tag.txt")
 
           echo "STAGING_TAG=$STAGING_TAG" >> $GITHUB_ENV
@@ -36,15 +38,15 @@ jobs:
       - name: Deploy to Production VM
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: 48.193.42.143
+          host: ${{ vars.PRODUCTION_VM_HOST }}
           username: vivere
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           envs: REGISTRY,STAGING_TAG
           script: |
-
             set -e
 
-            docker login harbor-vivere.evanlwp.my.id \
+            # UPDATE: Menggunakan GitHub Variable untuk Domain Harbor Registry
+            docker login ${{ vars.HARBOR_REGISTRY }} \
               -u "${{ secrets.HARBOR_USER }}" \
               -p "${{ secrets.HARBOR_PASSWORD }}"
 
@@ -68,35 +70,24 @@ jobs:
             sleep 15
 
             if docker ps --format '{{.Names}}' | grep -q '^web-app-prod$'; then
-
               echo "Container is running"
-
               echo "$STAGING_TAG" > /home/vivere/current_prod_tag.txt
-
             else
-
               echo "Deployment failed. Starting rollback..."
-
               docker stop web-app-prod || true
               docker rm web-app-prod || true
 
               if [ -n "$PREVIOUS_TAG" ]; then
-
                 docker pull $REGISTRY:$PREVIOUS_TAG
-
                 docker run -d \
                   --restart unless-stopped \
                   --name web-app-prod \
                   -p 80:80 \
                   $REGISTRY:$PREVIOUS_TAG
-
                 echo "Rollback completed to $PREVIOUS_TAG"
-
               else
-
                 echo "No rollback image found"
                 exit 1
-
               fi
             fi
 
