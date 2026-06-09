@@ -52,7 +52,7 @@ jobs:
 
       - name: Run Playwright E2E Test
         run: |
-          npx playwright test tests/e2e.spec.js
+          npx playwright test tests/e2e.spec.js --reporter=html
 
       - name: Cleanup E2E Container
         if: always()
