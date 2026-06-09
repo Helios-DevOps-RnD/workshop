@@ -82,6 +82,7 @@ jobs:
             -Dsonar.projectKey=vivere-guest-webapp
             -Dsonar.sources=src
             -Dsonar.tests=tests
+            -Dsonar.qualitygate.wait=true
 
       # =========================
       # BUILD IMAGE
