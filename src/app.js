@@ -21,7 +21,7 @@ function deleteGuest(id) {
     localStorage.setItem(StorageKey, JSON.stringify(guests));
 }
 
-// Support untuk Node.js environment (Jest) tanpa merusak browser
+// Support untuk Node.js environment (Jest) tanpa merusak browserr
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { getGuests, addGuest, deleteGuest, StorageKey };
 }
