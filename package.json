@@ -5,6 +5,11 @@
     "test": "jest",
     "test:e2e": "playwright test"
   },
+  "jest": {
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ]
+  },
   "devDependencies": {
     "@playwright/test": "^1.55.0",
     "jest": "^30.0.0"

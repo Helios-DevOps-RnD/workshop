@@ -1,8 +1,19 @@
+/*
+ * Legacy one-screen registry bootstrap.
+ * The operational demo now starts from src/app/main.js.
+ * This file is retained as vulnerable workshop reference material only.
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
     const guestInput = document.getElementById('guestName');
     const addBtn = document.getElementById('addBtn');
     const guestList = document.getElementById('guestList');
 
+    if (!guestInput || !addBtn || !guestList) {
+        return;
+    }
+
+    // INTENTIONAL VULNERABILITY FOR DEMO PURPOSES:
     // VULNERABILITY (DAST): DOM-based XSS via URL Parameters
     // Jika user mengakses: ?welcome=<script>alert('XSS')</script>
     const urlParams = new URLSearchParams(window.location.search);
@@ -23,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         guests.forEach(guest => {
             const li = document.createElement('li');
             
+            // INTENTIONAL VULNERABILITY FOR DEMO PURPOSES:
             // VULNERABILITY (DAST): Stored XSS
             // Menggunakan innerHTML alih-alih textContent. Coba input nama: <img src=x onerror=alert(1)>
             li.innerHTML = `<span class="guest-name">${guest.name}</span>`;
@@ -57,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loginBtn) {
         loginBtn.addEventListener('click', () => {
             const pwd = document.getElementById('adminPwd').value;
+            // INTENTIONAL VULNERABILITY FOR DEMO PURPOSES:
             // Hardcoded password validation di sisi client
             if (pwd == "admin123") {
                 alert("Login Sukses! Anda sekarang Admin.");
