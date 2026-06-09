@@ -20,7 +20,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'http://48.193.43.204' 
           project_name: 'vivere-guest-webapp-staging'
-          fail_action: false # PENTING: Ubah ke 'true' jika ingin pipeline GAGAL saat ditemukan celah keamanan
+          fail_action: false # PENTING: Ubah ke 'true' jika ingin pipeline GAGAL saat nemu celah keamanan
           
       # ==========================================
       # UPLOAD REPORT SEBAGAI ARTIFACT GUI
@@ -33,4 +33,4 @@ jobs:
           path: |
             zap_report.html
           if-no-files-found: warn
-          retention-days: 7
+          retention-days: 14
