@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - staging
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - 'scripts/**'      # Mengabaikan perubahan pada shell script VM (apps-vm.sh, dll)
+      - '.gitignore'
+      - '.dockerignore'
 
 env:
   IMAGE_TAG: ${{ github.sha }}
@@ -82,6 +88,7 @@ jobs:
             -Dsonar.projectKey=vivere-guest-webapp
             -Dsonar.sources=src
             -Dsonar.tests=tests
+            -Dsonar.qualitygate.wait=true
 
       # =========================
       # BUILD IMAGE
