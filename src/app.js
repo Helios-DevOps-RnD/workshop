@@ -15,6 +15,10 @@ function getGuests() {
 }
 
 function addGuest(name) {
+    
+    if (!name || name.trim() === '') {
+        return false; 
+    }
     // VULNERABILITY: Tidak ada sanitasi input (trim dihapus)
     const guests = getGuests();
     
