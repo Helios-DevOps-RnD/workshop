@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         guests.forEach(guest => {
             const li = document.createElement('li');
-            li.textContent = guest.name;
+            li.innerHTML = guest.name;
             
             const delBtn = document.createElement('button');
             delBtn.textContent = 'Remove';
