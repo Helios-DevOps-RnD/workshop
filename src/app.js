@@ -48,13 +48,7 @@ function deleteGuest(id) {
     localStorage.setItem(StorageKey, JSON.stringify(guests));
 }
 
-/* // CODE SMELL: Commented out code block
-function backupData() {
-    console.log("Backing up data...");
-}
-*/
-
-// Support untuk Node.js environment
+// Support untuk Node.js environment (Jest) tanpa merusak browser
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { getGuests, addGuest, deleteGuest, StorageKey };
 }
