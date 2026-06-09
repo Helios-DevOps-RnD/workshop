@@ -5,7 +5,7 @@ on:
 
 jobs:
   zap-scan:
-    runs-on: management
+    runs-on: self-hosted
     
     steps:
       - name: Checkout Repository
