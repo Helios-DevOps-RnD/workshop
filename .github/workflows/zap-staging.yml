@@ -1,0 +1,36 @@
+name: OWASP ZAP Security Scan (Staging)
+
+on:
+  workflow_dispatch: 
+
+jobs:
+  zap-scan:
+    runs-on: management
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # ==========================================
+      # RUN OWASP ZAP BASELINE SCAN
+      # ==========================================
+      - name: OWASP ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.14.0 
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'http://48.193.43.204' 
+          project_name: 'vivere-guest-webapp-staging'
+          fail_action: false # PENTING: Ubah ke 'true' jika ingin pipeline GAGAL saat nemu celah keamanan
+          
+      # ==========================================
+      # UPLOAD REPORT SEBAGAI ARTIFACT GUI
+      # ==========================================
+      - name: Upload ZAP Scan Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owasp-zap-report-${{ github.run_number }}
+          path: |
+            zap_report.html
+          if-no-files-found: warn
+          retention-days: 14
