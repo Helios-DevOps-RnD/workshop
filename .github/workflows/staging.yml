@@ -85,7 +85,7 @@ jobs:
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }} # Menggunakan GitHub Variable untuk IP VM Management
         with:
           args: >
-            -Dsonar.projectKey= ${{ vars.SONAR_PROJECT_KEY}}
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY}}
             -Dsonar.sources=src
             -Dsonar.tests=tests
             -Dsonar.qualitygate.wait=true
