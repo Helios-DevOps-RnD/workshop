@@ -9,7 +9,7 @@
         return '<section class="login-card">' +
             '<div class="brand-mark">V</div>' +
             '<p class="eyebrow">Vivere Hotel Operations</p>' +
-            '<h1>Mini Guest Reception App</h1>' +
+            '<h1>Mini Guest Reception App Demo</h1>' +
             '<p class="login-copy">Use the mock users for a controlled security training demo. This is intentionally frontend-only.</p>' +
             (message ? '<div class="alert alert-error">' + SafeRender.escapeHtml(message) + '</div>' : '') +
             '<form id="loginForm" class="stack">' +
