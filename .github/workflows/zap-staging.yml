@@ -18,7 +18,7 @@ jobs:
         uses: zaproxy/action-baseline@v0.14.0 
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: 'http://48.193.43.204' 
+          target: http://${{ vars.STAGING_VM_HOST }} 
           fail_action: false 
           allow_issue_writing: false 
           

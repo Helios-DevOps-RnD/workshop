@@ -13,7 +13,7 @@ on:
 
 env:
   IMAGE_TAG: ${{ github.sha }}
-  REGISTRY: harbor-vivere.evanlwp.my.id/app/guest-webapp
+  REGISTRY: "${{ vars.HARBOR_REGISTRY }}/app/guest-webapp"
   
 jobs:
   ci-cd-staging:
@@ -82,10 +82,10 @@ jobs:
         uses: sonarsource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: "http://70.153.137.147:9000" # IP VM Management Anda
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }} # Menggunakan GitHub Variable untuk IP VM Management
         with:
           args: >
-            -Dsonar.projectKey=vivere-guest-webapp
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY}}
             -Dsonar.sources=src
             -Dsonar.tests=tests
             -Dsonar.qualitygate.wait=true
@@ -118,7 +118,7 @@ jobs:
 
       - name: Login Harbor
         run: |
-          docker login harbor-vivere.evanlwp.my.id \
+          docker login ${{ vars.HARBOR_REGISTRY }} \
             -u "${{ secrets.HARBOR_USER }}" \
             -p "${{ secrets.HARBOR_PASSWORD }}"
 
@@ -133,11 +133,11 @@ jobs:
       - name: Deploy to Staging VM
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: 48.193.43.204
+          host: ${{ vars.STAGING_VM_HOST }}
           username: vivere
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker login harbor-vivere.evanlwp.my.id \
+            docker login ${{ vars.HARBOR_REGISTRY }} \
               -u "${{ secrets.HARBOR_USER }}" \
               -p "${{ secrets.HARBOR_PASSWORD }}"
 
