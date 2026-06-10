@@ -75,9 +75,9 @@ RUNNER_DIR="$USER_HOME/actions-runner"
 mkdir -p $RUNNER_DIR
 cd $RUNNER_DIR
 
-wget https://github.com/actions/runner/releases/download/v2.317.0/actions-runner-linux-x64-2.317.0.tar.gz
-tar xzf ./actions-runner-linux-x64-2.317.0.tar.gz
-rm ./actions-runner-linux-x64-2.317.0.tar.gz
+wget https://github.com/actions/runner/releases/download/v2.334.0/actions-runner-linux-x64-2.334.0.tar.gz
+tar xzf ./actions-runner-linux-x64-2.334.0.tar.gz
+rm ./actions-runner-linux-x64-2.334.0.tar.gz
 
 # Install internal dependencies OS
 ./bin/installdependencies.sh
