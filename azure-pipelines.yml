@@ -1,9 +1,11 @@
 # Azure DevOps pipeline
 # Runs unit tests only, then stops.
-# https://aka.ms/yaml
 
 trigger:
-- main
+  branches:
+    include:
+      - staging
+      - main
 
 pool:
   vmImage: ubuntu-latest
