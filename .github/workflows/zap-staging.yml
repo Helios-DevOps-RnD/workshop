@@ -1,30 +1,28 @@
 name: OWASP ZAP Security Scan (Staging)
 
 on:
-  workflow_dispatch: 
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
 
 jobs:
   zap-scan:
     runs-on: self-hosted
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # ==========================================
-      # RUN OWASP ZAP BASELINE SCAN
-      # ==========================================
       - name: OWASP ZAP Baseline Scan
-        uses: zaproxy/action-baseline@v0.14.0 
+        uses: zaproxy/action-baseline@v0.15.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          target: http://${{ vars.STAGING_VM_HOST }} 
-          fail_action: false 
-          allow_issue_writing: false 
-          
-      # ==========================================
-      # UPLOAD REPORT SEBAGAI ARTIFACT GUI
-      # ==========================================
+          target: http://${{ vars.STAGING_VM_HOST }}
+          fail_action: false
+          allow_issue_writing: "false"
+          artifact_name: zap_scan
+
       - name: Upload ZAP Scan Report
         if: always()
         uses: actions/upload-artifact@v4
@@ -32,5 +30,7 @@ jobs:
           name: owasp-zap-report-${{ github.run_number }}
           path: |
             zap_report.html
+            zap_report.md
+            zap_report.json
           if-no-files-found: warn
           retention-days: 14
